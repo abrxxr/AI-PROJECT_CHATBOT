@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:site_name" content="View Varshith's Portfolio Website">
+    <meta property="og:title" content="Developer | Varshith" />
+    <meta property="og:description"
+        content="Hello there 👋🏻,My name is Varshith Hegde.I am a Computer Engineering student at Maangalore Institute of Technology And Engineering 👨🏻‍💻📚I am eager to hear about potential career opportunities, so I would be pleased to chat about job openings in the engineering sphere.Send 'help' to know more about me." />
+    <meta property="og:type" content="website" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:image:type" content="image/jpeg">
+
+    <link rel="icon" type="image/png" href="images/favicon.ico" />
+    <meta property="og:image:width" content="300">
+    <meta property="og:image:height" content="300">
+    <meta property="og:updated_time" content="1440432930" />
+
+    <title>Code Generator</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            font-family: Verdana, Tahoma, sans-serif;
+        }
+        
+        body{
+            padding-top: 1vh;
+            background-color: #b41e1e;
+            background-size: unset;
+             background-repeat: repeat; 
+            background-image:url('data:image/png;base64,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');
+            height: 98vh;
+        }
+        
+        nav{
+            display: flex;
+            height: 6%;
+            background-color: #202c33;
+        }
+        
+        .navbar{
+            width: 100%;
+            display: flex;
+        }
+        
+        
+        .dpimg{
+            cursor: pointer;
+            border-radius: 100%;
+            width: 15%;
+            height: 15%;
+            height: auto;
+            margin: auto 0px;
+            margin-left: 10px;
+        }
+        
+        .navbar .personalInfo{
+            line-height: 100%;
+            display: flex;
+            flex-direction: column;
+            margin: auto 0px;
+            margin-left: 2%;
+        }
+        
+        .personalInfo #name{
+            color: #e9edef;
+            margin-bottom: 4px;
+        }
+        
+        .personalInfo #lastseen{
+            color: #8696a0;
+            font-size: small;
+        }
+        
+        
+        .scrollable{
+            overflow-y: scroll;
+            color: #fff;
+            display: flex;
+            height: 88%;
+            flex-direction: column;
+            background-image: url('images/bg2.jpg');
+            align-items: flex-end;
+            position: relative;
+            -ms-overflow-style: none; 
+            scrollbar-width: none; 
+            position: relative;
+        }
+        
+        .scrollable .chatting{
+            overflow-y: scroll;
+            -ms-overflow-style: none; 
+            scrollbar-width:none; 
+            position: relative;
+            height: 100%;
+            width: 100%;
+            background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhaD2rYn8fj-rFV9q-W8lXo8IWx1Z2vIHEnw&s');
+            background-image:no-repeat;
+        }
+        
+        .scrollable .chatting::-webkit-scrollbar {
+            display: none;
+          }
+        
+        #listUL{
+            overflow-y: hidden;
+            position: static;
+            width: 100%;
+            bottom: 0;
+            list-style-type: none;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #listUL li{
+            width: 100%;
+            text-decoration: none;
+            flex-direction: row-reverse;
+        }
+        
+        .sent{
+            text-align: end;
+            float: right;
+            width: auto;
+            max-width: 45%;
+        }
+        
+        .green{
+            margin: 5px;
+            text-align: start;
+            width: auto;
+            padding: 10px;
+            background-color: #005c4b;
+            border-radius: 15px 15px 0px;
+        }
+        
+        #sentlabel{
+            color: #94bab3;
+            display: block;
+            text-align: end;
+            font-size: x-small;
+        }
+        
+        .recieved{
+            float: left;
+            width: 45%;
+            max-width: 45%;
+            background-color: rgb(216, 30, 30);
+        
+        }
+        
+        
+        .grey{
+            max-width: 60%;
+            margin: 5px;
+            text-align: start;
+            width: auto;
+            padding: 10px;
+            background-color: rgb(158, 228, 20);
+            border-radius: 0px 15px 15px;
+            color: white;
+        }
+        
+        .grey .mapview{
+            margin: auto;
+            display: flex;
+            padding: 5px;
+        }
+        
+        .add address{
+            margin-top: 10px;
+            padding-left: 15px;
+        }
+        
+        .map{
+            margin: auto;
+            width: 100%;
+            border-radius: 10px;
+        }
+        
+        .dateLabel{
+            color: #94bab3;
+            display: block;
+            text-align: end;
+            font-size: x-small;
+        }
+        
+        
+        /* help menu bold words color  */
+        
+        .sk .bold{
+            color: rgba(219, 154, 33, 0.822);
+        }
+        
+        
+        /* resume thumbnail in received class*/
+        .resumeThumbnail{
+            width: 100%;
+            border-radius: 10px 10px 0px 0px;
+        }
+        
+        .downloadSpace{
+            background-color: #1d282f;
+            display: flex;
+            width: 100%;
+        }
+        .downloadSpace .pdfname{
+            display: flex;
+            width: 100%;
+        }
+        .pdfname label{
+            margin: auto 0px;
+        }
+        .downloadSpace img{
+            width: 30px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        /* this css is used for embedded html in messages */
+        .bold{
+            font-weight: bold;
+        }
+        
+        .alink{
+            color: goldenrod;
+            transition: all 600ms ease;
+            text-decoration: none;
+        }
+        
+        .alink:hover{
+            text-decoration: none;
+            color: green;
+        }
+        
+        /* this css is used for social links message */
+        
+        .social{
+            padding: 10px;
+        }
+        
+        .social .socialItem{
+            width: 100%;
+            border-radius: 10px;
+            background-color: #94bab3;
+            cursor: pointer;
+            display: flex;
+            margin-bottom: 10px;
+            transition: all 500ms ease-in-out;
+        }
+        
+        .social .socialItemI{
+            margin: auto;
+            padding: 10px;
+            flex-direction: column;
+        }
+        
+        .social .socialItem:hover{
+            background-color: rgba(58, 170, 58, 0.863);
+        }
+        #call{
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .number{
+            display: none;
+        }
+        
+        
+        
+        
+        .scrollable .fullScreenDP{
+            transition: all 700ms ease-in-out;
+            position: absolute;;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            background-color: #2f2f2fec;
+            z-index: 1000;
+        }
+        
+        .scrollable .fullScreenDP .insideDP{
+            display: flex;
+            margin: auto;
+            scrollbar-width: 0px;
+        }
+        
+        .closeBTN{
+            width: 30px;
+            height: 30px;
+            display: block;
+            position: absolute;
+            margin-left: 6%;
+            margin-top: 5px;
+            cursor: pointer;
+            
+        }
+        
+        .btnColor{
+            fill: rgba(0, 0, 0, 0.692);
+            transition: all 400ms ease-in-out;
+        }
+        
+        .closeBTN:hover .btnColor{
+            fill: red;
+        }
+        
+        
+        
+        .scrollable .fullScreenDP .insideDP .dp{
+            width: 90%;
+            margin: auto;
+            border-radius: 10px;
+        }
+        
+        
+        
+        
+        
+        
+        
+        footer{
+            position: relative;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            color: white;
+            text-align: center;
+            height: auto;
+            background-color: #202c33;
+            text-align: center;
+        }
+        
+        .sendBar{
+            display: flex;
+            height: 100%;
+            width: 100%;
+            margin: auto;
+        }
+        .sendBar svg{
+            margin: auto;
+            height: 40%;
+            min-height: 40%;
+        
+        }
+        
+        .sendBar input[type='text']{
+            margin: auto;
+            margin: 5px;
+            border-radius: 10px;
+            padding: 10px;
+            color: #fff;
+            float: left;
+            width: 80%;
+            height: 100%;
+            outline-color: transparent;
+            accent-color: transparent;
+            background-color: #2a3942;
+            outline: none;
+            border-color: transparent;
+        }
+        
+        
+        ::placeholder { 
+            color: #8696a0;
+            opacity: 1; 
+          }
+          
+          :-ms-input-placeholder { 
+            color: #8696a0;
+          }
+          
+          ::-ms-input-placeholder { 
+            color: #8696a0;
+          }
+        
+        
+        
+        @media screen and (min-width: 1024px) {
+        
+            body{
+                margin: auto;
+                width: 50vw;
+            }
+        
+            .sendBar{
+                width: 85%;
+            }
+        
+            .scrollable{
+                -ms-overflow-style: none; 
+                scrollbar-width: none; 
+                position: relative;
+                overflow: hidden;
+            }
+        
+            
+        
+            .scrollable .fullScreenDP{
+                display: none;
+                width: 100%;
+                height: 100%;
+                overflow-y: scroll;
+            }
+        
+        
+            .scrollable .fullScreenDP .insideDP{
+                display: flex;
+                width: 70%;
+            }
+        
+        
+            .scrollable .fullScreenDP .dp{
+                width: 50%;
+                margin: auto;
+            }
+        
+            .scrollable .closeBTN{
+                margin-top: 15px;
+            }
+        
+            #call:hover .number{
+                display: block;
+                height: auto;
+            }
+        }
+    </style>
+
+</head>
+
+<body onload="startFunction()">
+
+  
+
+    <nav>
+
+        <div class="navbar">
+            <img class="dpimg" onclick="openFullScreenDP()" src="./static/bg.jpeeg" alt="" height:"40px" width:"40px">
+            <div class="personalInfo">
+                <label id="name">CIT ASSISTANT CHATBOT..!!!</label>
+                <label id="lastseen">Am ready to help for you..!!</label>
+            </div>
+        </div>
+
+    </nav>
+
+
+    <div class="scrollable" id="myScrollable" >
+
+        <div class="fullScreenDP" id="fullScreenDP">
+            <div class="insideDP">
+                <img class="dp"  onclick="openFullScreenDP()" src="images/varshi1.jpg" alt="">
+                <svg class="closeBTN" onclick="closeFullDP()" xmlns="http://www.w3.org/2000/svg" width="64px"
+                    viewBox="0 0 512 512" height="64px">
+                    <path class="btnColor" fill="#E04F5F"
+                        d="M504.1,256C504.1,119,393,7.9,256,7.9C119,7.9,7.9,119,7.9,256C7.9,393,119,504.1,256,504.1C393,504.1,504.1,393,504.1,256z" />
+                    <path fill="#FFF"
+                        d="M285,256l72.5-84.2c7.9-9.2,6.9-23-2.3-31c-9.2-7.9-23-6.9-30.9,2.3L256,222.4l-68.2-79.2c-7.9-9.2-21.8-10.2-31-2.3c-9.2,7.9-10.2,21.8-2.3,31L227,256l-72.5,84.2c-7.9,9.2-6.9,23,2.3,31c4.1,3.6,9.2,5.3,14.3,5.3c6.2,0,12.3-2.6,16.6-7.6l68.2-79.2l68.2,79.2c4.3,5,10.5,7.6,16.6,7.6c5.1,0,10.2-1.7,14.3-5.3c9.2-7.9,10.2-21.8,2.3-31L285,256z" />
+                </svg>
+            </div>
+        </div>
+
+        <div id="chatting" class="chatting">
+            <ul id="listUL">
+            </ul>
+        </div>
+    </div>
+
+
+    <footer>
+        <div class="sendBar">
+            <input id="inputMSG" onkeypress="isEnter(event)" type="text" placeholder="Type a message" autofocus>
+            <svg onclick="sendMsg()" viewBox="0 0 24 24" width="24" height="24" class="">
+                <path fill="currentColor"
+                    d="M1.101 21.757 23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
+            </svg>
+        </div>
+    </footer>
+<script>
+    var audio = new Audio('assets/sentmessage.mp3');
+    var contactString = "<div class='social'> <a target='_blank' href='tel:+916363549133'> <div class='socialItem' id='call'><img class='socialItemI' src='images/phone.svg'/><label class='number'></label></label></div> </a> <a href='mailto:varshithvh@gmail.com'> <div class='socialItem'><img class='socialItemI' src='images/gmail.svg' alt=''></div> </a> <a target='_blank' href='https://github.com/Varshithvhegde'> <div class='socialItem'><img class='socialItemI' src='images/github.svg' alt=''></div> </a> <a target='_blank' href='https://wa.me/916363549133'> <div class='socialItem'><img class='socialItemI' src='images/whatsapp.svg' alt=''>";
+    var resumeString = "<img src='images/resume_thumbnail.png' class='resumeThumbnail'><div class='downloadSpace'><div class='pdfname'><img src='images/pdf.png'><label>Varshith V Hegde Resume.pdf</label></div><a href='assets/varshith_v_hegde_resume.pdf' download='varshith_v_hegde_resume.pdf'><img class='download' src='images/downloadIcon.svg'></a></div>";
+    var addressString = "<div class='mapview'><iframe src='https://www.google.com/maps/dir//Moodbidri+private+Bus+Stand,+Bus+Stand+Rd,+Mudbidri,+Karnataka+574227/@13.0639,74.9991985,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3ba4ab3d49331379:0x17be05cb5b69caa2!2m2!1d74.9957298!2d13.0680955?hl=en' class='map'></iframe></div><label class='add'><address>B2 'Asara'<br>Kodoli<br>Kolhapur, Maharashtra, INDIA 416114</address>";
+    
+    function startFunction() {
+        setLastSeen();
+        waitAndResponce("intro");
+    }
+    
+    function setLastSeen() {
+        var date = new Date();
+        var lastSeen = document.getElementById("lastseen");
+        lastSeen.innerText = "last seen today at " + date.getHours() + ":" + date.getMinutes()
+    }
+    
+    
+    function closeFullDP() {
+        var x = document.getElementById("fullScreenDP");
+        if (x.style.display === 'flex') {
+            x.style.display = 'none';
+        } else {
+            x.style.display = 'flex';
+        }
+    }
+    
+    function openFullScreenDP() {
+        var x = document.getElementById("fullScreenDP");
+        if (x.style.display === 'flex') {
+            x.style.display = 'none';
+        } else {
+            x.style.display = 'flex';
+        }
+    }
+    
+    
+    function isEnter(event) {
+        if (event.keyCode == 13) {
+            sendMsg();
+        }
+    }
+    
+    function sendMsg() {
+        var input = document.getElementById("inputMSG");
+        var ti = input.value;
+        if (input.value == "") {
+            return;
+        }
+        var date = new Date();
+        var myLI = document.createElement("li");
+        var myDiv = document.createElement("div");
+        var greendiv = document.createElement("div");
+        var dateLabel = document.createElement("label");
+        dateLabel.innerText = date.getHours() + ":" + date.getMinutes();
+        myDiv.setAttribute("class", "sent");
+        greendiv.setAttribute("class", "green");
+        dateLabel.setAttribute("class", "dateLabel");
+        greendiv.innerText = input.value;
+        myDiv.appendChild(greendiv);
+        myLI.appendChild(myDiv);
+        greendiv.appendChild(dateLabel);
+        document.getElementById("listUL").appendChild(myLI);
+        var s = document.getElementById("chatting");
+        s.scrollTop = s.scrollHeight;
+        setTimeout(function () { waitAndResponce(ti) }, 1500);
+        input.value = "";
+        playSound();
+    }
+    
+    function waitAndResponce(inputText) {
+        var lastSeen = document.getElementById("lastseen");
+        lastSeen.innerText = "typing...";
+        var name="";
+        if(inputText.toLowerCase().includes("my name is")){
+            name=inputText.substring(inputText.indexOf("is")+2);
+            if(name.toLowerCase().includes("varshith")){
+                sendTextMessage("Ohh! That's my name too");
+                
+            }
+            inputText="input";
+        }
+        switch (inputText.toLowerCase().trim()) {
+            case "intro":
+                setTimeout(() => {
+                    sendTextMessage("Hello there 👋🏻,<br><br>Am your ..<span class='bold'><a class='alink'>BOTCODE</a>.</span><br><br>Am your Code Assistant..<span class='bold'>Botcode..👨🏻‍💻📚</span><br><br>Send <span class='bold'>'hi'</span> to know more about me.<br>");
+                }, 2000);
+                break;
+            case "hi":
+                sendTextMessage("Hello>>>!!! Welcome to our CIT chatbot......");
+                break;
+            case "department":
+                sendTextMessage("1. CSE<br>2. AIML<br>3. AIDS<br>4. CYBER SECURITY<br>5. MECHANICAL<br>6. MECHATRONICS<br>7. ACT<br>8. CIVIL<br>9. EEE<br>10. BIO MEDICAL ENGNEERING<br>11. CSBS<br>12. IT");
+                break;
+            case "lab available":
+                sendTextMessage("1. Computer lab<br>2. Communication lab (for Fluency in English)<br>3.CElectrical & Electronics Lab<br>4. Manufacturing Technology lab (Mech Engg)<br>5. Electrical Circuit Lab<br>6. Electron Devices Lab<br>7. Strength of Materials Lab<br>8. Fluid Mechanics & Machinery Lab<br>9. CAD Lab<br>10. Survey Lab are some of the labs offered to the students<br>11. Physics Lab<br>12. Chemistry Lab<br>13. Workshop Lab.");
+                break;
+            case "about hostel":
+                sendTextMessage("EACH ROOM INCLUDES:<br>1. Comfortable Cots:  Sleep well on comfortable cot<br>2. Wardrobe & Study Table:  Ample storage space and a dedicated study area to help you stay organized");
+                break;
+    
+            case "about transport":
+                sendTextMessage("A fleet of Buses is operating across the city to our College. The bus network covers all corners of the city and important junctions. A team of experienced drivers drive our buses complying all safety norms and traffic rules. The College encourages the student to make use of the transport so that they can reach the college in time safely and comfortably. With the help of individual bus incharges, special attention is given on all the students for their commutation<br><br>*Also, MTC bus facilities and Auto Facilities are available to our College campus at frequent intervals throughout the day<br><br>*For Transport Related Queries, Contact:1233");
+                break;
+            
+            case "placements":
+                sendTextMessage("At Chennai Institute of Technology, the Placement Team is focused on delivering  placement opportunities with Marque Placements (abAt Chennai Institute of Technology, the Placement Team is focused on delivering  placement opportunities with Marque Placements (above 20 LPA), Super Dream Placements (BETWEEN 10LPA – 20LPA and Dream Placements (between 6 LPA – 10LPA) for all aspiring students. ove 20 LPA), Super Dream Placements (BETWEEN 10LPA – 20LPA and Dream Placements (between 6 LPA – 10LPA) for all aspiring students. ");
+                break;
+    
+            case "coe":
+                sendTextMessage("1. Centre for System Design (CSD)<br>2. Centre for Additive Manufacturing<br>3. Centre for Artificial Intelligence & Research (CAIR)<br>4. Centre for 3D-Printing and Reverse Engineering<br>5. Centre for NC Technologies<br>6. Centre for Industrial Automation / Industrial Robotics & Automation<br>7. T&VS Centre for VLSI Design<br>8. Centre for Material Research (CMR)<br>9. Centre for Nanotechnology<br>10. Centre for Biomedical Engineering & Research<br>11. Centre for Defense & Space Research<br>Centre for Energy (Solar & Wind) & Research<br>12. HCL Centre for Embedded and Imaging Technology<br>13. Centre for Industrial Robotics (with e.g. KUKA) / Robotics-related CoE<br>14. Centre for New Energy / Sustainable Energy<br>15. KUKA Center for Industrial Robotics<br>16. Tekla Center for Buildings Education<br>17. Center of Excellence<br>AND MORE 13+ COE AVAILALE.... ");
+                break;
+            case "curriculum delivery":
+                sendTextMessage("Chennai Institute of Technology ( CIT) is affiliated to Anna University, Chennai, Tamilnadu and follows the curriculum and syllabus framed for affiliated colleges. In order to ensure the effective curriculum delivery, CIT adopts its unique innovative methods and systematic strategies. The three phases of our systematic strategy comprises of Planning, Development & Implementation and Evaluation.");
+                break;
+            case "value added course":
+                sendTextMessage("1. Java<br>2. Net Training Program<br>3. Full Stack Developemnt training<br>4. Oracle<br>5. BPM<br>6.Website Developement<br>7. Mobile App Development<br>8. Networking<br>9. VLSI Design<br>10. MATLAB<br>11. PLC<br>11. Embedded C & Image Processing<br>12. Internet of Things<br>13. New Energy – Solar, Wind<br>14. CATIA & Solid Works<br<15. ANSYS<br>16. Training on Modeling & Simulation using DELMIA<br>17. PLM<br>18. Industry Robot Training Program (Basic, Intermediate, Expert Level)<br>19. Industrial Automation<br>20. Training on Calibration Instruments<br>AND 8 MORE");
+                break;
+            case "training methods":
+                sendTextMessage("At CIT, training methodologies are meticulously designed to empower students from the very beginning of their academic journey. CIT understands  the importance of laying a strong foundation, which is why CIT’s placement training commences as early as the first semester.<br><br> Key Placement Activities:<br>1. Training for Problem-Solving Skills<br>2. Cognitive and Logical Thinking Development<br>3. Communication Skills Training<br>4. Domain-Specific and Core Skills Training<br>5. Job-Specific Skills Enhancement<br>6. Mock Interviews & Assessment<br>7. Industry Collaboration & Internships.");
+                break;
+            case "sports":
+                sendTextMessage("* GYMNASIUM FACILITIES<br>* YOGA CLASSES<br>* Volleyball<br>* Basketball<br>* Ball-Badminton<br>* Throw ball<br>* Cricket Nets<br>* Cricket Grounds<br>* Football<br>* Multi Gym<br>* Table Tennis<br>* Carrom<br>* Chess<br>* 200 M Standard Track – field.");
+                break;
+            case "auditorium":
+                sendTextMessage("WE HAVE CURRENTLY 3 MAIN AUDITORIUMS<br><br> 1. Shri Parthasarathy Auditorium<br>2. CAUVERY AS Mini Auditorium and<br>3. PENNAY HALL. ");
+                break;
+            case "ict":
+                sendTextMessage("Our college has a dedicated internet lab working 24 hours a day 7 days a week. We have 2 GBPS Internet (1 GBPS 1:1 dedicated least line from Vodafone, 1 GBPS Mbps 1:1 dedicated leased Line from Jio).  The internet can be accessed from more than 1200 computers. The campus intranet has important details about Test Schedules, Time Tables, Examination Schedules, Campus News etc., and a wealth of information about the college<br><br>The Centre provides system administration and technical support which include Software installation, Network monitoring (both wired & wireless), Internet connection and digital library etc.");
+                break;
+            case "library":
+                sendTextMessage("Chennai Institute of Technology has an excellent library for the benefit of students, faculties and researchers. As one of the best established libraries according to International Standards, the library has a great collection of books covering various branches of Engineering and Technology, Science and Humanities and its related fields. The library is well protected with fire alarms and CCTV Security systems.");
+                break;
+            case "health centre":
+                sendTextMessage("The Health Centre here at Chennai Institute of Technology is well equipped. It has separate inpatient facility for male and female students The health centre provides quality health care in a comfortable and confidential environment.The health centre is manned by a medical officer and a healthcare assistant to provide excellent medical care to all the students. The Medical Officer Dr. Siddharthan D. R. M.B.B.S and Dr.Vaishali Shanmugam, Psychiatrist manage the various aspects of the facility, in the future we look forward in expanding and bringing in high tech medical equipment to serve better the students of our college.");
+                break;
+            case "for more details":
+                sendTextMessage("CONTACT https://www.citchennai.edu.in/ OR tel:+91 44 7111 9111 AND info@citchennai.net")
+                break;
+            case "clear":
+                clearChat();
+                break;
+            // case "about":
+    
+            //     break;
+            
+            
+            case "time":
+                var date = new Date();
+                sendTextMessage("NoW the time is " + date.getHours() + ":" + date.getMinutes());
+                break;
+    
+            case "date":
+                var date = new Date();
+                sendTextMessage("Current date is " + date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear());
+                break;
+    
+            case "hai":
+                sendTextMessage("Hello there 👋🏻");
+                sendTextMessage("<span class='sk'>Send Keyword to get what you want to know about Botcode...<br>e.g<br><span class='bold'>'skills'</span> - to know my skills<br><span class='bold'>'resume'</span> - to get my resume<br><span class='bold'>'education'</span> - to get my education details<br><span class='bold'>'contact'</span> - to get ways to connect with me<br><span class='bold'>'projects'</span> - to get details of my projects<br><span class='bold'>'clear'</span> - to clear conversation<br>");
+                break;
+            case "hello":
+                sendTextMessage("Hello there 👋🏻");
+                sendTextMessage("<span class='sk'>Send Keyword to get what you want to know about me...<br>e.g<br><span class='bold'>'skills'</span> - to know my skills<br><span class='bold'>'resume'</span> - to get my resume<br><span class='bold'>'education'</span> - to get my education details<br><span class='bold'>'contact'</span> - to get ways to connect with me<br><span class='bold'>'projects'</span> - to get details of my projects<br><span class='bold'>'clear'</span> - to clear conversation<br>");
+                break;
+            
+            default:
+                setTimeout(() => {
+                    sendTextMessage("Hey I couldn't catch you...😢<br>Send 'help' to know more about usage.");
+                }, 2000);
+                break;
+        }
+    
+    
+    
+    }
+    
+    
+    function clearChat() {
+        document.getElementById("listUL").innerHTML = "";
+        waitAndResponce('intro');
+    }
+    
+    
+    
+    function sendTextMessage(textToSend) {
+        setTimeout(setLastSeen, 1000);
+        var date = new Date();
+        var myLI = document.createElement("li");
+        var myDiv = document.createElement("div");
+        var greendiv = document.createElement("div");
+        var dateLabel = document.createElement("label");
+        dateLabel.setAttribute("id", "sentlabel");
+        dateLabel.id = "sentlabel";
+        dateLabel.innerText = date.getHours() + ":" + date.getMinutes();
+        myDiv.setAttribute("class", "received");
+        greendiv.setAttribute("class", "grey");
+        greendiv.innerHTML = textToSend;
+        myDiv.appendChild(greendiv);
+        myLI.appendChild(myDiv);
+        greendiv.appendChild(dateLabel);
+        document.getElementById("listUL").appendChild(myLI);
+        var s = document.getElementById("chatting");
+        s.scrollTop = s.scrollHeight;
+        playSound();
+    }
+    
+    
+    function sendResponse() {
+        setTimeout(setLastSeen, 1000);
+        var date = new Date();
+        var myLI = document.createElement("li");
+        var myDiv = document.createElement("div");
+        var greendiv = document.createElement("div");
+        var dateLabel = document.createElement("label");
+        dateLabel.innerText = date.getHours() + ":" + date.getMinutes();
+        myDiv.setAttribute("class", "received");
+        greendiv.setAttribute("class", "grey");
+        dateLabel.setAttribute("class", "dateLabel");
+        greendiv.innerText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. ";
+        myDiv.appendChild(greendiv);
+        myLI.appendChild(myDiv);
+        greendiv.appendChild(dateLabel);
+        document.getElementById("listUL").appendChild(myLI);
+        var s = document.getElementById("chatting");
+        s.scrollTop = s.scrollHeight;
+        playSound();
+    }
+    
+    function playSound() {
+        audio.play();
+    }
+    
+</script>
+
+</body>
+
+</html>
