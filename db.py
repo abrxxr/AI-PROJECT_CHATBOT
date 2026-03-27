@@ -1,42 +1,33 @@
-import pymongo
 from flask import request
 
-client = pymongo.MongoClient('mongodb+srv://abraar2813:abraar2813@cluster0.gdpgdjc.mongodb.net/?appName=Cluster0')
-userdb = client['userdb']
-users = userdb.customers
-
+# In-memory dictionary to replace the broken MongoDB cluster
+users_db = {}
 
 def insert_data():
-	if request.method == 'POST':
-		name = request.form['name']
-		email = request.form['email']
-		password = request.form['pass']
+    if request.method == 'POST':
+        name = request.form.get('name', '')
+        email = request.form.get('email', '')
+        password = request.form.get('pass', '')
 
-		reg_user = {}
-		reg_user['name'] = name
-		reg_user['email'] = email
-		reg_user['password'] = password
-
-		if users.find_one({"email":email}) == None:
-			users.insert_one(reg_user)
-			return True
-		else:
-			return False
-
+        if email not in users_db:
+            users_db[email] = {
+                'name': name,
+                'email': email,
+                'password': password
+            }
+            return True
+        else:
+            return False
+    return False
 
 def check_user():
+    if request.method == 'POST':
+        email = request.form.get('email', '')
+        password = request.form.get('pass', '')
 
-	if request.method == 'POST':
-		email = request.form['email']
-		password = request.form['pass']
-
-		user = {
-			"email": email,
-			"password": password
-		}
-
-		user_data = users.find_one(user)
-		if user_data == None:
-			return False, ""
-		else:
-			return True, user_data["name"]
+        user_data = users_db.get(email)
+        if user_data is None or user_data['password'] != password:
+            return False, ""
+        else:
+            return True, user_data["name"]
+    return False, ""
