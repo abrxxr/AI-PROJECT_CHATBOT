@@ -1,15 +1,52 @@
 # cretrential
 import db
 import json
-
+import os
 from flask import Flask, render_template, request
+from openai import OpenAI
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 app = Flask(__name__)
+
+# Initialize OpenAI client
+# Set your OpenAI API key here or use environment variable
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", "your-api-key-here"))
+
 standard_answers = {
     "what is your name?":"My name is Sathvik Bot!"
 }
 chat_history = []
 import logging
 import joblib
+
+def generate_llm_response(user_input):
+    """Generate a response using OpenAI's GPT model based on user input."""
+    try:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key or api_key == "your-api-key-here":
+            return "I'm sorry, but the AI service is not configured yet. Please set up your OpenAI API key in the .env file."
+        
+        # Check if it's a standard question first
+        if user_input.lower() in standard_answers:
+            return standard_answers[user_input.lower()]
+        
+        # Use LLM for dynamic responses
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful AI assistant chatbot. Respond naturally and helpfully to user queries. Keep responses concise but informative."},
+                {"role": "user", "content": user_input}
+            ],
+            max_tokens=150,
+            temperature=0.7
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        logging.error(f"Error generating LLM response: {e}")
+        return "Sorry, I'm having trouble processing your request right now. Please try again later."
 
 @app.route('/', methods = ['GET', 'POST'])
 def view():
@@ -49,7 +86,7 @@ def home():
         return render_template("chat.html", messages=chat_history)
     else:
         user_response = request.form.get("input")
-        ans = standard_answers.get(user_response.lower(), "Sorry, I could not understand")
+        ans = generate_llm_response(user_response)
         chat_history.append("You: " + user_response)
         chat_history.append("Me: " + str(ans))
 
