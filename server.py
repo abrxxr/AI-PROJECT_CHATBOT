@@ -183,15 +183,19 @@ def home():
 
 @app.route('/api/chat', methods=['POST'])
 def api_chat():
-    data = request.get_json(silent=True) or {}
-    user_input = data.get('input', '').strip()
-    if user_input == '':
-        return jsonify({'error': 'No input provided.'}), 400
+    try:
+        data = request.get_json(silent=True) or {}
+        user_input = data.get('input', '').strip()
+        if user_input == '':
+            return jsonify({'error': 'No input provided.'}), 400
 
-    answer = generate_llm_response(user_input)
-    chat_history.append('You: ' + user_input)
-    chat_history.append('Me: ' + answer)
-    return jsonify({'response': answer})
+        answer = generate_llm_response(user_input)
+        chat_history.append('You: ' + user_input)
+        chat_history.append('Me: ' + answer)
+        return jsonify({'response': answer})
+    except Exception as e:
+        logging.exception('Unhandled exception in api_chat')
+        return jsonify({'error': 'Internal server error. Check server logs for details.'}), 500
 
 
 if __name__ == '__main__':
