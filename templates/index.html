@@ -498,18 +498,18 @@
 
         function startFunction() {
             setLastSeen();
-            waitAndResponce("intro");
+            callApiChat('intro');
         }
 
         function setLastSeen() {
             var date = new Date();
-            var lastSeen = document.getElementById("lastseen");
-            lastSeen.innerText = "last seen today at " + date.getHours() + ":" + date.getMinutes()
+            var lastSeen = document.getElementById('lastseen');
+            lastSeen.innerText = 'last seen today at ' + date.getHours() + ':' + date.getMinutes();
         }
 
 
         function closeFullDP() {
-            var x = document.getElementById("fullScreenDP");
+            var x = document.getElementById('fullScreenDP');
             if (x.style.display === 'flex') {
                 x.style.display = 'none';
             } else {
@@ -518,7 +518,7 @@
         }
 
         function openFullScreenDP() {
-            var x = document.getElementById("fullScreenDP");
+            var x = document.getElementById('fullScreenDP');
             if (x.style.display === 'flex') {
                 x.style.display = 'none';
             } else {
@@ -534,138 +534,67 @@
         }
 
         function sendMsg() {
-            var input = document.getElementById("inputMSG");
+            var input = document.getElementById('inputMSG');
             var ti = input.value;
-            if (input.value == "") {
+            if (!ti || ti.trim() === '') {
                 return;
             }
             var date = new Date();
-            var myLI = document.createElement("li");
-            var myDiv = document.createElement("div");
-            var greendiv = document.createElement("div");
-            var dateLabel = document.createElement("label");
-            dateLabel.innerText = date.getHours() + ":" + date.getMinutes();
-            myDiv.setAttribute("class", "sent");
-            greendiv.setAttribute("class", "green");
-            dateLabel.setAttribute("class", "dateLabel");
-            greendiv.innerText = input.value;
+            var myLI = document.createElement('li');
+            var myDiv = document.createElement('div');
+            var greendiv = document.createElement('div');
+            var dateLabel = document.createElement('label');
+            dateLabel.innerText = date.getHours() + ':' + date.getMinutes();
+            myDiv.setAttribute('class', 'sent');
+            greendiv.setAttribute('class', 'green');
+            dateLabel.setAttribute('class', 'dateLabel');
+            greendiv.innerText = ti;
             myDiv.appendChild(greendiv);
             myLI.appendChild(myDiv);
             greendiv.appendChild(dateLabel);
-            document.getElementById("listUL").appendChild(myLI);
-            var s = document.getElementById("chatting");
+            document.getElementById('listUL').appendChild(myLI);
+            var s = document.getElementById('chatting');
             s.scrollTop = s.scrollHeight;
-            setTimeout(function () { waitAndResponce(ti) }, 1500);
-            input.value = "";
+            input.value = '';
             playSound();
+
+            setTimeout(function () { callApiChat(ti); }, 500);
+        }
+
+        async function callApiChat(inputText) {
+            var lastSeen = document.getElementById('lastseen');
+            lastSeen.innerText = 'typing...';
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ input: inputText })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Server responded with status ' + response.status);
+                }
+
+                const data = await response.json();
+                const reply = data.response || data.error || 'Sorry, I could not get a reply right now.';
+                sendTextMessage(reply);
+            } catch (error) {
+                console.error('callApiChat error:', error);
+                sendTextMessage('Sorry, I am having trouble connecting to the AI service. Please try again.');
+            } finally {
+                setLastSeen();
+            }
         }
 
         function waitAndResponce(inputText) {
-            var lastSeen = document.getElementById("lastseen");
-            lastSeen.innerText = "typing...";
-            var name = "";
-            if (inputText.toLowerCase().includes("my name is")) {
-                name = inputText.substring(inputText.indexOf("is") + 2);
-                if (name.toLowerCase().includes("varshith")) {
-                    sendTextMessage("Ohh! That's my name too");
+            callApiChat(inputText);
+        }
 
-                }
-                inputText = "input";
-            }
-            switch (inputText.toLowerCase().trim()) {
-                case "intro":
-                    setTimeout(() => {
-                        sendTextMessage("Hello there 👋🏻,<br><br>Am your ..<span class='bold'><a class='alink'>BOTCODE</a>.</span><br><br>Am your Code Assistant..<span class='bold'>Botcode..👨🏻‍💻📚</span><br><br>Send <span class='bold'>'hi'</span> to know more about me.<br>");
-                    }, 2000);
-                    break;
-                case "hi":
-                    sendTextMessage("Hello>>>!!! Welcome to our CIT chatbot......");
-                    break;
-                case "department":
-                    sendTextMessage("1. CSE<br>2. AIML<br>3. AIDS<br>4. CYBER SECURITY<br>5. MECHANICAL<br>6. MECHATRONICS<br>7. ACT<br>8. CIVIL<br>9. EEE<br>10. BIO MEDICAL ENGNEERING<br>11. CSBS<br>12. IT");
-                    break;
-                case "lab available":
-                    sendTextMessage("1. Computer lab<br>2. Communication lab (for Fluency in English)<br>3.CElectrical & Electronics Lab<br>4. Manufacturing Technology lab (Mech Engg)<br>5. Electrical Circuit Lab<br>6. Electron Devices Lab<br>7. Strength of Materials Lab<br>8. Fluid Mechanics & Machinery Lab<br>9. CAD Lab<br>10. Survey Lab are some of the labs offered to the students<br>11. Physics Lab<br>12. Chemistry Lab<br>13. Workshop Lab.");
-                    break;
-                case "about hostel":
-                    sendTextMessage("EACH ROOM INCLUDES:<br>1. Comfortable Cots:  Sleep well on comfortable cot<br>2. Wardrobe & Study Table:  Ample storage space and a dedicated study area to help you stay organized");
-                    break;
-
-                case "about transport":
-                    sendTextMessage("A fleet of Buses is operating across the city to our College. The bus network covers all corners of the city and important junctions. A team of experienced drivers drive our buses complying all safety norms and traffic rules. The College encourages the student to make use of the transport so that they can reach the college in time safely and comfortably. With the help of individual bus incharges, special attention is given on all the students for their commutation<br><br>*Also, MTC bus facilities and Auto Facilities are available to our College campus at frequent intervals throughout the day<br><br>*For Transport Related Queries, Contact:1233");
-                    break;
-
-                case "placements":
-                    sendTextMessage("At Chennai Institute of Technology, the Placement Team is focused on delivering  placement opportunities with Marque Placements (abAt Chennai Institute of Technology, the Placement Team is focused on delivering  placement opportunities with Marque Placements (above 20 LPA), Super Dream Placements (BETWEEN 10LPA – 20LPA and Dream Placements (between 6 LPA – 10LPA) for all aspiring students. ove 20 LPA), Super Dream Placements (BETWEEN 10LPA – 20LPA and Dream Placements (between 6 LPA – 10LPA) for all aspiring students. ");
-                    break;
-
-                case "coe":
-                    sendTextMessage("1. Centre for System Design (CSD)<br>2. Centre for Additive Manufacturing<br>3. Centre for Artificial Intelligence & Research (CAIR)<br>4. Centre for 3D-Printing and Reverse Engineering<br>5. Centre for NC Technologies<br>6. Centre for Industrial Automation / Industrial Robotics & Automation<br>7. T&VS Centre for VLSI Design<br>8. Centre for Material Research (CMR)<br>9. Centre for Nanotechnology<br>10. Centre for Biomedical Engineering & Research<br>11. Centre for Defense & Space Research<br>Centre for Energy (Solar & Wind) & Research<br>12. HCL Centre for Embedded and Imaging Technology<br>13. Centre for Industrial Robotics (with e.g. KUKA) / Robotics-related CoE<br>14. Centre for New Energy / Sustainable Energy<br>15. KUKA Center for Industrial Robotics<br>16. Tekla Center for Buildings Education<br>17. Center of Excellence<br>AND MORE 13+ COE AVAILALE.... ");
-                    break;
-                case "curriculum delivery":
-                    sendTextMessage("Chennai Institute of Technology ( CIT) is affiliated to Anna University, Chennai, Tamilnadu and follows the curriculum and syllabus framed for affiliated colleges. In order to ensure the effective curriculum delivery, CIT adopts its unique innovative methods and systematic strategies. The three phases of our systematic strategy comprises of Planning, Development & Implementation and Evaluation.");
-                    break;
-                case "value added course":
-                    sendTextMessage("1. Java<br>2. Net Training Program<br>3. Full Stack Developemnt training<br>4. Oracle<br>5. BPM<br>6.Website Developement<br>7. Mobile App Development<br>8. Networking<br>9. VLSI Design<br>10. MATLAB<br>11. PLC<br>11. Embedded C & Image Processing<br>12. Internet of Things<br>13. New Energy – Solar, Wind<br>14. CATIA & Solid Works<br<15. ANSYS<br>16. Training on Modeling & Simulation using DELMIA<br>17. PLM<br>18. Industry Robot Training Program (Basic, Intermediate, Expert Level)<br>19. Industrial Automation<br>20. Training on Calibration Instruments<br>AND 8 MORE");
-                    break;
-                case "training methods":
-                    sendTextMessage("At CIT, training methodologies are meticulously designed to empower students from the very beginning of their academic journey. CIT understands  the importance of laying a strong foundation, which is why CIT’s placement training commences as early as the first semester.<br><br> Key Placement Activities:<br>1. Training for Problem-Solving Skills<br>2. Cognitive and Logical Thinking Development<br>3. Communication Skills Training<br>4. Domain-Specific and Core Skills Training<br>5. Job-Specific Skills Enhancement<br>6. Mock Interviews & Assessment<br>7. Industry Collaboration & Internships.");
-                    break;
-                case "sports":
-                    sendTextMessage("* GYMNASIUM FACILITIES<br>* YOGA CLASSES<br>* Volleyball<br>* Basketball<br>* Ball-Badminton<br>* Throw ball<br>* Cricket Nets<br>* Cricket Grounds<br>* Football<br>* Multi Gym<br>* Table Tennis<br>* Carrom<br>* Chess<br>* 200 M Standard Track – field.");
-                    break;
-                case "auditorium":
-                    sendTextMessage("WE HAVE CURRENTLY 3 MAIN AUDITORIUMS<br><br> 1. Shri Parthasarathy Auditorium<br>2. CAUVERY AS Mini Auditorium and<br>3. PENNAY HALL. ");
-                    break;
-                case "ict":
-                    sendTextMessage("Our college has a dedicated internet lab working 24 hours a day 7 days a week. We have 2 GBPS Internet (1 GBPS 1:1 dedicated least line from Vodafone, 1 GBPS Mbps 1:1 dedicated leased Line from Jio).  The internet can be accessed from more than 1200 computers. The campus intranet has important details about Test Schedules, Time Tables, Examination Schedules, Campus News etc., and a wealth of information about the college<br><br>The Centre provides system administration and technical support which include Software installation, Network monitoring (both wired & wireless), Internet connection and digital library etc.");
-                    break;
-                case "library":
-                    sendTextMessage("Chennai Institute of Technology has an excellent library for the benefit of students, faculties and researchers. As one of the best established libraries according to International Standards, the library has a great collection of books covering various branches of Engineering and Technology, Science and Humanities and its related fields. The library is well protected with fire alarms and CCTV Security systems.");
-                    break;
-                case "health centre":
-                    sendTextMessage("The Health Centre here at Chennai Institute of Technology is well equipped. It has separate inpatient facility for male and female students The health centre provides quality health care in a comfortable and confidential environment.The health centre is manned by a medical officer and a healthcare assistant to provide excellent medical care to all the students. The Medical Officer Dr. Siddharthan D. R. M.B.B.S and Dr.Vaishali Shanmugam, Psychiatrist manage the various aspects of the facility, in the future we look forward in expanding and bringing in high tech medical equipment to serve better the students of our college.");
-                    break;
-                case "for more details":
-                    sendTextMessage("CONTACT https://www.citchennai.edu.in/ OR tel:+91 44 7111 9111 AND info@citchennai.net")
-                    break;
-                case "clear":
-                    clearChat();
-                    break;
-                case "":
-                    sendTextMessage("")
-                    
-                    break;
-
-
-                case "time":
-                    var date = new Date();
-                    sendTextMessage("NoW the time is " + date.getHours() + ":" + date.getMinutes());
-                    break;
-
-                case "date":
-                    var date = new Date();
-                    sendTextMessage("Current date is " + date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear());
-                    break;
-
-                case "hai":
-                    sendTextMessage("Hello there 👋🏻");
-                    sendTextMessage("<span class='sk'>Send Keyword to get what you want to know about Botcode...<br>e.g<br><span class='bold'>'skills'</span> - to know my skills<br><span class='bold'>'resume'</span> - to get my resume<br><span class='bold'>'education'</span> - to get my education details<br><span class='bold'>'contact'</span> - to get ways to connect with me<br><span class='bold'>'projects'</span> - to get details of my projects<br><span class='bold'>'clear'</span> - to clear conversation<br>");
-                    break;
-                case "hello":
-                    sendTextMessage("Hello there 👋🏻");
-                    sendTextMessage("<span class='sk'>Send Keyword to get what you want to know about me...<br>e.g<br><span class='bold'>'skills'</span> - to know my skills<br><span class='bold'>'resume'</span> - to get my resume<br><span class='bold'>'education'</span> - to get my education details<br><span class='bold'>'contact'</span> - to get ways to connect with me<br><span class='bold'>'projects'</span> - to get details of my projects<br><span class='bold'>'clear'</span> - to clear conversation<br>");
-                    break;
-
-                default:
-                    setTimeout(() => {
-                        sendTextMessage("Hey I couldn't catch you...😢<br>Send 'help' to know more about usage.");
-                    }, 2000);
-                    break;
-            }
-
-
-
+        function clearChat() {
+            document.getElementById('listUL').innerHTML = '';
+            callApiChat('intro');
         }
 
 
