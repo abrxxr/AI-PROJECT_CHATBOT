@@ -26,7 +26,7 @@ known_answers = {
     "resume": "You can download my resume from the link in the response.",
     "education": "I am studying B.E. in Computer Science Engineering.",
     "chatbot": "I am your AI chatbot assistant built with GPT. You can ask me anything about your college, courses, and more.",
-    "who are you": "I am a chatbot assistant that provides info about your institution and can answer general questions with OpenAI GPT."
+    "who are you": "I am a chatbot assistant that provides info about your institution and can answer general questions with OpenAI GPT.",
     "contact": "Email, phone, and GitHub links are available on the website.",
     "projects": "I have projects on GitHub including AI chatbot, web apps, and mobile apps.",
     "department": "CSE, AIML, AIDS, CYBER SECURITY, MECHANICAL, MECHATRONICS, ACT, CIVIL, EEE, BIO MEDICAL ENGINEERING, CSBS, IT.",
@@ -114,14 +114,14 @@ def generate_llm_response(user_input):
 
     try:
         api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key or api_key == "your-api-key-here":
-            # provide a helpful local fallback when OpenAI is not configured
-            return known_answers.get("chatbot", "I'm sorry, but the AI service is not configured yet. Please set up your OpenAI API key in the .env file.")
+        # Check if API key is missing or set to the default placeholder in .env
+        if not api_key or api_key in ["your-api-key-here", "your-openai-api-key-here", ""]:
+            return "🤖 **AI Not Configured:** I'm a chatbot assistant, but my AI brain (OpenAI GPT) isn't connected yet! Please add a valid `OPENAI_API_KEY` in the `.env` file to enable smart responses."
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful AI assistant chatbot. Respond naturally and helpfully to user queries. Keep responses concise but informative."},
+                {"role": "system", "content": "You are a helpful AI assistant chatbot for a college. Respond naturally and helpfully to user queries. Keep responses concise but informative."},
                 {"role": "user", "content": user_input}
             ],
             max_tokens=150,
@@ -132,11 +132,11 @@ def generate_llm_response(user_input):
         return "I understood your question, but I couldn't generate a response. Please try again."
     except Exception as e:
         logging.error(f"Error generating LLM response: {e}")
-        # fallback to known answers for key phrases before final error
-        rescue = extract_keyword_response(user_input)
-        if rescue:
-            return rescue
-        return "Sorry, I'm having trouble processing your request right now. Please try again later."
+        # When OpenAI API fails (like incorrect key), tell the user explicitly
+        if "Incorrect API key" in str(e) or "AuthenticationError" in str(type(e).__name__):
+            return "🤖 **Authentication Error:** The OpenAI API key provided in the `.env` file is invalid. Please double check it."
+        
+        return "Sorry, I'm having trouble connecting to my AI servers right now. Please try again later."
 @app.route('/', methods = ['GET', 'POST'])
 def view():
     return render_template("index.html")
