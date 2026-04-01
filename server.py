@@ -4,7 +4,7 @@ import json
 import os
 import difflib
 from flask import Flask, render_template, request, jsonify
-from openai import OpenAI
+from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -12,22 +12,20 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Initialize OpenAI client
-# Set your OpenAI API key here or use environment variable
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", "your-api-key-here"))
-
+# Google Gemini will be initialized inside the generate_llm_response function
 standard_answers = {
-    "what is your name?":"My name is Sathvik Bot!"
+    "what is your name?":"My name is CIT Assistant Chatbot!"
 }
 known_answers = {
-    "intro": "Hello there 👋🏻, I am your AI assistant. Send 'help' to know more.",
+    "intro": "Hello there 👋🏻, I am the CIT Assistant Chatbot. I represent Chennai Institute of Technology (CIT) 👨🏻‍💻📚 I am here to help answer any questions you have about our college, courses, transport, fees, and more. Send 'help' to know what I can do.",
     "help": "Send a keyword like skills, resume, education, contact, projects. I also answer free-text questions.",
     "skills": "I can code in Python, JavaScript, C, and build web/mobile apps.",
-    "resume": "You can download my resume from the link in the response.",
+    "resume": "<img src='images/resume_thumbnail.png' class='resumeThumbnail'><div class='downloadSpace'><div class='pdfname'><img src='images/pdf.png'><label>CIT_College_Brochure.pdf</label></div><a href='assets/CIT_College_Brochure.pdf' download='CIT_College_Brochure.pdf'><img class='download' src='images/downloadIcon.svg'></a></div>",
     "education": "I am studying B.E. in Computer Science Engineering.",
     "chatbot": "I am your AI chatbot assistant built with GPT. You can ask me anything about your college, courses, and more.",
-    "who are you": "I am a chatbot assistant that provides info about your institution and can answer general questions with OpenAI GPT.",
-    "contact": "Email, phone, and GitHub links are available on the website.",
+    "who are you": "I am an AI assistant for Chennai Institute of Technology (CIT).",
+    "contact": "<div class='social'> <a target='_blank' href='tel:+914427152000'> <div class='socialItem' id='call'><img class='socialItemI' src='images/phone.svg'/><label class='number'></label></label></div> </a> <a href='mailto:info@citchennai.net'> <div class='socialItem'><img class='socialItemI' src='images/gmail.svg' alt=''></div> </a> <a target='_blank' href='https://www.citchennai.edu.in/'> <div class='socialItem'><img class='socialItemI' src='images/github.svg' alt=''></div> </a> </div>",
+    "address": "<div class='mapview'><iframe src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.828693892705!2d80.040176!3d12.982845!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a52f4d07355bab5%3A0xbb6063169c4ed4d9!2sChennai%20Institute%20of%20Technology!5e0!3m2!1sen!2sin!4v1712213197678!5m2!1sen!2sin' class='map'></iframe></div><label class='add'><address>Sarathy Nagar, Kundrathur<br>Chennai, Tamil Nadu 600069<br>INDIA</address>",
     "projects": "I have projects on GitHub including AI chatbot, web apps, and mobile apps.",
     "department": "CSE, AIML, AIDS, CYBER SECURITY, MECHANICAL, MECHATRONICS, ACT, CIVIL, EEE, BIO MEDICAL ENGINEERING, CSBS, IT.",
     "lab available": "Computer lab, Communication lab, Electrical & Electronics Lab, Manufacturing Technology lab, Electrical Circuit Lab, etc.",
@@ -65,7 +63,8 @@ intent_synonyms = {
     "hi": ["hi", "he", "h", "hey", "hello"],
     "help": ["help", "support", "assist"],
     "chatbot": ["chatbot", "bot", "assistant", "ai assistant"],
-    "who are you": ["who are you", "what are you", "your identity"]
+    "who are you": ["who are you", "what are you", "your identity"],
+    "address": ["address", "location", "where are you", "map"]
 }
 
 chat_history = []
@@ -103,7 +102,7 @@ def extract_keyword_response(user_input):
 
 
 def generate_llm_response(user_input):
-    """Generate a response using OpenAI's GPT model based on user input."""
+    """Generate a response using Google Gemini model based on user input."""
     user_input = (user_input or "").strip()
     if not user_input:
         return "Please type something so I can help you."
@@ -113,28 +112,28 @@ def generate_llm_response(user_input):
         return keyword_response
 
     try:
-        api_key = os.getenv("OPENAI_API_KEY")
+        api_key = os.getenv("GEMINI_API_KEY")
         # Check if API key is missing or set to the default placeholder in .env
-        if not api_key or api_key in ["your-api-key-here", "your-openai-api-key-here", ""]:
-            return "🤖 **AI Not Configured:** I'm a chatbot assistant, but my AI brain (OpenAI GPT) isn't connected yet! Please add a valid `OPENAI_API_KEY` in the `.env` file to enable smart responses."
+        if not api_key or api_key in ["your-gemini-key-here", ""]:
+            return '🤖 **AI Not Configured:** I need a "brain" to understand that! Please get your **free** Gemini API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="alink">Google AI Studio</a> and add it as `GEMINI_API_KEY` to the `.env` file!'
 
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful AI assistant chatbot for a college. Respond naturally and helpfully to user queries. Keep responses concise but informative."},
-                {"role": "user", "content": user_input}
-            ],
-            max_tokens=150,
-            temperature=0.7
+        from google import genai
+        client = genai.Client(api_key=api_key)
+        
+        prompt = f"You are the official AI assistant representing Chennai Institute of Technology (CIT), an engineering college. You are helping visitors on the college website. Respond naturally and helpfully. Keep responses concise but informative.\n\nUser Question: {user_input}"
+        
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
         )
-        if response and response.choices and len(response.choices) > 0:
-            return response.choices[0].message.content.strip()
+        if response and response.text:
+            return response.text.strip()
         return "I understood your question, but I couldn't generate a response. Please try again."
     except Exception as e:
         logging.error(f"Error generating LLM response: {e}")
-        # When OpenAI API fails (like incorrect key), tell the user explicitly
-        if "Incorrect API key" in str(e) or "AuthenticationError" in str(type(e).__name__):
-            return "🤖 **Authentication Error:** The OpenAI API key provided in the `.env` file is invalid. Please double check it."
+        error_msg = str(e).lower()
+        if "api key" in error_msg or "authentication" in error_msg or "unauthorized" in error_msg or "400" in error_msg:
+            return "🤖 **Authentication Error:** The Gemini API key provided in the `.env` file is invalid. Please verify it at Google AI Studio."
         
         return "Sorry, I'm having trouble connecting to my AI servers right now. Please try again later."
 @app.route('/', methods = ['GET', 'POST'])
