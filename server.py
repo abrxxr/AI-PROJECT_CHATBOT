@@ -25,6 +25,8 @@ known_answers = {
     "skills": "I can code in Python, JavaScript, C, and build web/mobile apps.",
     "resume": "You can download my resume from the link in the response.",
     "education": "I am studying B.E. in Computer Science Engineering.",
+    "chatbot": "I am your AI chatbot assistant built with GPT. You can ask me anything about your college, courses, and more.",
+    "who are you": "I am a chatbot assistant that provides info about your institution and can answer general questions with OpenAI GPT."
     "contact": "Email, phone, and GitHub links are available on the website.",
     "projects": "I have projects on GitHub including AI chatbot, web apps, and mobile apps.",
     "department": "CSE, AIML, AIDS, CYBER SECURITY, MECHANICAL, MECHATRONICS, ACT, CIVIL, EEE, BIO MEDICAL ENGINEERING, CSBS, IT.",
@@ -61,7 +63,9 @@ intent_synonyms = {
     "library": ["library", "book"],
     "health centre": ["health centre", "health center", "medical"],
     "hi": ["hi", "he", "h", "hey", "hello"],
-    "help": ["help", "support", "assist"]
+    "help": ["help", "support", "assist"],
+    "chatbot": ["chatbot", "bot", "assistant", "ai assistant"],
+    "who are you": ["who are you", "what are you", "your identity"]
 }
 
 chat_history = []
@@ -111,7 +115,8 @@ def generate_llm_response(user_input):
     try:
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key or api_key == "your-api-key-here":
-            return "I'm sorry, but the AI service is not configured yet. Please set up your OpenAI API key in the .env file."
+            # provide a helpful local fallback when OpenAI is not configured
+            return known_answers.get("chatbot", "I'm sorry, but the AI service is not configured yet. Please set up your OpenAI API key in the .env file.")
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -127,8 +132,11 @@ def generate_llm_response(user_input):
         return "I understood your question, but I couldn't generate a response. Please try again."
     except Exception as e:
         logging.error(f"Error generating LLM response: {e}")
+        # fallback to known answers for key phrases before final error
+        rescue = extract_keyword_response(user_input)
+        if rescue:
+            return rescue
         return "Sorry, I'm having trouble processing your request right now. Please try again later."
-
 @app.route('/', methods = ['GET', 'POST'])
 def view():
     return render_template("index.html")
