@@ -44,6 +44,26 @@ known_answers = {
     "time": "Use JavaScript to get current local time on the client side.",
     "date": "Use JavaScript to get today's date on the client side."
 }
+
+intent_synonyms = {
+    "department": ["department", "departments", "departmnt", "dept"],
+    "lab available": ["lab available", "labs", "lab", "available lab"],
+    "about hostel": ["about hostel", "hostel", "hostel details"],
+    "about transport": ["about transport", "transport", "bus", "travel"],
+    "placements": ["placements", "placement", "job placement"],
+    "coe": ["coe", "centre of excellence", "center of excellence"],
+    "curriculum delivery": ["curriculum delivery", "syllabus", "curriculum"],
+    "value added course": ["value added course", "extra course"],
+    "training methods": ["training methods", "training"],
+    "sports": ["sports", "sport"],
+    "auditorium": ["auditorium", "auditoriums"],
+    "ict": ["ict", "information and communication technology"],
+    "library": ["library", "book"],
+    "health centre": ["health centre", "health center", "medical"],
+    "hi": ["hi", "he", "h", "hey", "hello"],
+    "help": ["help", "support", "assist"]
+}
+
 chat_history = []
 import logging
 import joblib
@@ -52,12 +72,29 @@ def extract_keyword_response(user_input):
     normalized = user_input.lower().strip()
     if normalized in standard_answers:
         return standard_answers[normalized]
+
+    # direct known answer by key
+    if normalized in known_answers:
+        return known_answers[normalized]
+
+    # try synonyms map
+    for canonical, variants in intent_synonyms.items():
+        for variant in variants:
+            if variant in normalized:
+                if canonical in known_answers:
+                    return known_answers[canonical]
+                break
+
+    # partial match on known_answers
     for key, value in known_answers.items():
         if key in normalized:
             return value
-    close = difflib.get_close_matches(normalized, known_answers.keys(), n=1, cutoff=0.5)
+
+    # closest known intent by string similarity
+    close = difflib.get_close_matches(normalized, list(known_answers.keys()), n=1, cutoff=0.5)
     if close:
         return known_answers[close[0]]
+
     return None
 
 
