@@ -2,7 +2,8 @@
 import db
 import json
 import os
-from flask import Flask, render_template, request
+import difflib
+from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -18,22 +19,63 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", "your-api-key-here"))
 standard_answers = {
     "what is your name?":"My name is Sathvik Bot!"
 }
+known_answers = {
+    "intro": "Hello there 👋🏻, I am your AI assistant. Send 'help' to know more.",
+    "help": "Send a keyword like skills, resume, education, contact, projects. I also answer free-text questions.",
+    "skills": "I can code in Python, JavaScript, C, and build web/mobile apps.",
+    "resume": "You can download my resume from the link in the response.",
+    "education": "I am studying B.E. in Computer Science Engineering.",
+    "contact": "Email, phone, and GitHub links are available on the website.",
+    "projects": "I have projects on GitHub including AI chatbot, web apps, and mobile apps.",
+    "department": "CSE, AIML, AIDS, CYBER SECURITY, MECHANICAL, MECHATRONICS, ACT, CIVIL, EEE, BIO MEDICAL ENGINEERING, CSBS, IT.",
+    "lab available": "Computer lab, Communication lab, Electrical & Electronics Lab, Manufacturing Technology lab, Electrical Circuit Lab, etc.",
+    "about hostel": "Hostel details: comfortable cots, wardrobe, study table, safe environment.",
+    "about transport": "A fleet of buses operates across the city with safe routes and incharges.",
+    "placements": "Placement categories: Marquee >20 LPA, Super Dream 10-20 LPA, Dream 6-10 LPA.",
+    "coe": "Centres of Excellence include CAIR, Additive Manufacturing, Industrial Automation, VLSI, Materials, Nanotech, etc.",
+    "curriculum delivery": "Curriculum delivery stays through planning, development, implementation, and evaluation.",
+    "value added course": "Value added courses: Java, .NET, Full Stack, Oracle, BPM, Web, Mobile, IoT, VLSI, etc.",
+    "training methods": "Training methods include problem solving, communication, domain skills, mock interviews, internships.",
+    "sports": "Sports facilities include gym, yoga, volleyball, basketball, cricket, football, table tennis and more.",
+    "auditorium": "Main auditoriums: Shri Parthasarathy, Cauvery, Pennay hall.",
+    "ict": "ICT features 2 Gbps internet, 1200+ computers, intranet with schedules and campus info.",
+    "library": "Library is well equipped with international standard collection and security systems.",
+    "health centre": "Health centre has separate male/female inpatient facility, medical officer and assistant.",
+    "time": "Use JavaScript to get current local time on the client side.",
+    "date": "Use JavaScript to get today's date on the client side."
+}
 chat_history = []
 import logging
 import joblib
 
+def extract_keyword_response(user_input):
+    normalized = user_input.lower().strip()
+    if normalized in standard_answers:
+        return standard_answers[normalized]
+    for key, value in known_answers.items():
+        if key in normalized:
+            return value
+    close = difflib.get_close_matches(normalized, known_answers.keys(), n=1, cutoff=0.5)
+    if close:
+        return known_answers[close[0]]
+    return None
+
+
 def generate_llm_response(user_input):
     """Generate a response using OpenAI's GPT model based on user input."""
+    user_input = (user_input or "").strip()
+    if not user_input:
+        return "Please type something so I can help you."
+
+    keyword_response = extract_keyword_response(user_input)
+    if keyword_response:
+        return keyword_response
+
     try:
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key or api_key == "your-api-key-here":
             return "I'm sorry, but the AI service is not configured yet. Please set up your OpenAI API key in the .env file."
-        
-        # Check if it's a standard question first
-        if user_input.lower() in standard_answers:
-            return standard_answers[user_input.lower()]
-        
-        # Use LLM for dynamic responses
+
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -43,7 +85,9 @@ def generate_llm_response(user_input):
             max_tokens=150,
             temperature=0.7
         )
-        return response.choices[0].message.content.strip()
+        if response and response.choices and len(response.choices) > 0:
+            return response.choices[0].message.content.strip()
+        return "I understood your question, but I couldn't generate a response. Please try again."
     except Exception as e:
         logging.error(f"Error generating LLM response: {e}")
         return "Sorry, I'm having trouble processing your request right now. Please try again later."
@@ -89,6 +133,21 @@ def home():
         ans = generate_llm_response(user_response)
         chat_history.append("You: " + user_response)
         chat_history.append("Me: " + str(ans))
+        return render_template("chat.html", messages=chat_history)
 
-        return render_template("chat.html", messages = chat_history)
-app.run(debug=True, threaded=False)
+
+@app.route('/api/chat', methods=['POST'])
+def api_chat():
+    data = request.get_json(silent=True) or {}
+    user_input = data.get('input', '').strip()
+    if user_input == '':
+        return jsonify({'error': 'No input provided.'}), 400
+
+    answer = generate_llm_response(user_input)
+    chat_history.append('You: ' + user_input)
+    chat_history.append('Me: ' + answer)
+    return jsonify({'response': answer})
+
+
+if __name__ == '__main__':
+    app.run(debug=True, threaded=False)

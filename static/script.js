@@ -62,23 +62,88 @@ function sendMsg() {
     document.getElementById("listUL").appendChild(myLI);
     var s = document.getElementById("chatting");
     s.scrollTop = s.scrollHeight;
-    setTimeout(function () { waitAndResponce(ti) }, 1500);
     input.value = "";
     playSound();
+
+    // call server side AI endpoint, fallback to existing local rule-based if it fails
+    callApiChat(ti);
+}
+
+function callApiChat(inputText) {
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ input: inputText })
+    })
+    .then((res) => {
+        if (!res.ok) throw new Error('API error');
+        return res.json();
+    })
+    .then((data) => {
+        if (data && data.response) {
+            sendTextMessage(data.response);
+        } else {
+            waitAndResponce(inputText);
+        }
+    })
+    .catch((err) => {
+        console.error('API chat failed:', err);
+        // fallback to local rule-based response if server is not available
+        waitAndResponce(inputText);
+    });
+}
+
+function normalizeInput(inputText) {
+    if (!inputText) return "";
+    var t = inputText.toLowerCase().trim();
+    var map = {
+        department: ["department", "departments", "deparment", "dept"],
+        "lab available": ["lab available", "labs", "lab", "available lab"],
+        "about hostel": ["hostel", "about hostel", "hostel details"],
+        "about transport": ["transport", "about transport", "bus", "travel"],
+        placements: ["placements", "placement", "job placement"],
+        coe: ["coe", "centre of excellence", "center of excellence"],
+        "curriculum delivery": ["curriculum delivery", "syllabus", "curriculum"],
+        "value added course": ["value added course", "value added", "extra course"],
+        "training methods": ["training methods", "training", "methods"],
+        sports: ["sports", "sport"],
+        auditorium: ["auditorium", "auditoriums"],
+        ict: ["ict", "information and communication technology"],
+        library: ["library", "book"],
+        "health centre": ["health centre", "health center", "medical"],
+        hi: ["hi", "hey", "hello", "he", "h"],
+        help: ["help", "support", "assist"]
+    };
+    for (var key in map) {
+        var variants = map[key];
+        for (var i = 0; i < variants.length; i++) {
+            if (t.includes(variants[i])) {
+                return key;
+            }
+        }
+    }
+    return t;
 }
 
 function waitAndResponce(inputText) {
     var lastSeen = document.getElementById("lastseen");
     lastSeen.innerText = "typing...";
     var name="";
+    var normalizedInput = normalizeInput(inputText);
+    if (normalizedInput === "hi") {
+        normalizedInput = "hi";
+    }
     if(inputText.toLowerCase().includes("my name is")){
-        name=inputText.substring(inputText.indexOf("is")+2);
+        name=inputText.substring(inputText.indexOf("is") + 2);
         if(name.toLowerCase().includes("varshith")){
             sendTextMessage("Ohh! That's my name too");
             
         }
-        inputText="input";
+        normalizedInput="input";
     }
+    inputText = normalizedInput;
     switch (inputText.toLowerCase().trim()) {
         case "intro":
             setTimeout(() => {
@@ -135,11 +200,10 @@ function waitAndResponce(inputText) {
             break;
         
         case "hi":
-            sendTextMessage("Hello there 👋🏻");
-            sendTextMessage("<span class='sk'>Send Keyword to get what you want to know about me...<br>e.g<br><span class='bold'>'skills'</span> - to know my skills<br><span class='bold'>'resume'</span> - to get my resume<br><span class='bold'>'education'</span> - to get my education details<br><span class='bold'>'contact'</span> - to get ways to connect with me<br><span class='bold'>'projects'</span> - to get details of my projects<br><span class='bold'>'clear'</span> - to clear conversation<br>");
-            break;
-        
+        case "he":
+        case "h":
         case "hey":
+        case "hello":
             sendTextMessage("Hello there 👋🏻");
             sendTextMessage("<span class='sk'>Send Keyword to get what you want to know about me...<br>e.g<br><span class='bold'>'skills'</span> - to know my skills<br><span class='bold'>'resume'</span> - to get my resume<br><span class='bold'>'education'</span> - to get my education details<br><span class='bold'>'contact'</span> - to get ways to connect with me<br><span class='bold'>'projects'</span> - to get details of my projects<br><span class='bold'>'clear'</span> - to clear conversation<br>");
             break;
@@ -181,7 +245,7 @@ function waitAndResponce(inputText) {
             break;
         default:
             setTimeout(() => {
-                sendTextMessage("Hey I couldn't catch you...😢<br>Send 'help' to know more about usage.");
+                sendTextMessage("Let's try a full question so I can give you the best answer. Send 'help' for keyword guidance.");
             }, 2000);
             break;
     }
